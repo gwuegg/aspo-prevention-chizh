@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>АСПО Контроль — экономический анализ скважины</title>
+<style>
+:root{--bg:#f3f6f8;--card:#fff;--text:#243342;--muted:#687887;--border:#dce3e8;--accent:#2479b8;--accent-bg:#e8f3fb;--panel:#f7f9fa}
+*{box-sizing:border-box}body{margin:0;padding:24px;background:var(--bg);color:var(--text);font:15px/1.5 "Segoe UI",Arial,sans-serif}
+.container{max-width:980px;margin:auto}.header{display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap;margin-bottom:20px}
+.eyebrow{font-size:11px;letter-spacing:2px;color:var(--muted)}h1{font-size:28px;margin:4px 0}h2{font-size:21px;margin:0 0 12px}h3{font-size:17px;margin:0 0 8px}
+.subtitle,.muted{color:var(--muted)}.tag{background:var(--accent-bg);padding:5px 10px;border-radius:20px;font-size:12px}
+.tabs{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px}.tabs button,.secondary{background:white;color:var(--text);border:1px solid var(--border);padding:10px 14px;border-radius:8px;cursor:pointer}
+.tabs button.active{background:var(--accent-bg);border-color:var(--accent);font-weight:700}
+.panel{background:var(--card);border:1px solid var(--border);border-radius:13px;padding:20px;margin-bottom:16px}
+.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:13px}
+label{display:block;font-size:13px;color:var(--muted);margin-bottom:5px}
+input{width:100%;padding:11px;border:1px solid #cbd5dc;border-radius:8px;font:inherit;background:white;color:var(--text)}
+input:focus{outline:2px solid #a9d5f1;border-color:var(--accent)}
+button.primary{width:100%;padding:14px;border:0;border-radius:9px;background:var(--accent);color:white;font-size:16px;font-weight:700;cursor:pointer}
+button:hover{filter:brightness(.97)}.section-title{font-weight:700;margin:4px 0 12px}.rule{border:0;border-top:1px solid var(--border);margin:18px 0}
+.result-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.metric{background:var(--panel);padding:13px;border-radius:9px}.metric strong{display:block;font-size:19px;margin-top:3px}
+.method{border:1px solid var(--border);border-radius:11px;padding:15px;margin-top:12px;background:var(--panel)}
+.method.best{border:2px solid var(--accent);background:#f0f8fd}
+.method-head{display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap}
+.num{font-size:22px;font-weight:750;margin:8px 0}.bar{height:9px;background:#e0e6eb;border-radius:8px;overflow:hidden}.bar div{height:100%;background:var(--accent)}
+.small{font-size:12px}.two-col{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:12px}
+.error{color:#b64232;margin:8px 0}.recommend{background:#edf6fb;border-left:4px solid var(--accent);padding:16px;border-radius:8px}
+footer{text-align:center;color:var(--muted);font-size:12px;padding:16px}
+[hidden]{display:none!important}
+@media(max-width:600px){body{padding:13px}.panel{padding:15px}.grid,.result-grid,.two-col{grid-template-columns:1fr}h1{font-size:23px}}
+@media print{body{background:white;padding:0}.tabs,#calcForm button,#reset,.no-print{display:none!important}.panel,.method{break-inside:avoid;box-shadow:none}.container{max-width:none}}
+</style>
+</head>
+<body>
+<div class="container">
+<header class="header">
+ <div><div class="eyebrow">НЕФТЕДОБЫЧА · АНАЛИТИЧЕСКАЯ СИСТЕМА</div><h1>АСПО Контроль</h1><div class="subtitle">Подбор технологии и расчёт экономической эффективности борьбы с асфальтосмолопарафиновыми отложениями</div></div>
+ <span class="tag">Учебная версия 1.0</span>
+</header>
+<nav class="tabs no-print">
+ <button class="active" data-tab="calc">Расчёт скважины</button>
+ <button data-tab="methods">Методы борьбы</button>
+ <button data-tab="about">Методика расчёта</button>
+</nav>
+<section id="calc">
+<form id="calcForm">
+ <div class="panel">
+  <h2>1. Параметры скважины</h2><p class="muted">Внесите исходные данные для анализа условий образования АСПО.</p>
+  <div class="grid">
+   <div><label for="prod">Дебит нефти, т/сут.</label><input id="prod" type="number" min=".1" step=".1" value="20" required></div>
+   <div><label for="par">Содержание парафина, %</label><input id="par" type="number" min="0" max="100" step=".1" value="5" required></div>
+   <div><label for="water">Обводнённость, %</label><input id="water" type="number" min="0" max="100" step=".1" value="30" required></div>
+   <div><label for="depth">Глубина скважины, м</label><input id="depth" type="number" min="1" value="2000" required></div>
+   <div><label for="price">Цена нефти / чистый доход, руб./т</label><input id="price" type="number" min="0" value="45000" step="100" required></div>
+   <div><label for="days">Расчётный период, дней</label><input id="days" type="number" min="1" max="365" value="365" required></div>
+  </div>
+ </div>
+ <div class="panel">
+  <h2>2. Экономические параметры методов</h2><p class="muted">Значения предварительные. Их можно заменить данными конкретного месторождения.</p>
+  <div class="section-title">Тепловой метод</div>
+  <div class="grid">
+   <div><label for="tcost">Стоимость обработки, руб.</label><input id="tcost" type="number" min="0" value="1126.91"></div>
+   <div><label for="tint">Интервал между обработками, дней</label><input id="tint" type="number" min="1" value="15"></div>
+   <div><label for="tdown">Простой одной обработки, часов</label><input id="tdown" type="number" min="0" value="12"></div>
+  </div>
+  <hr class="rule">
+  <div class="section-title">Механический метод</div>
+  <div class="grid">
+   <div><label for="mcost">Стоимость обработки, руб.</label><input id="mcost" type="number" min="0" value="84.10"></div>
+   <div><label for="mint">Интервал между обработками, дней</label><input id="mint" type="number" min="1" value="5"></div>
+   <div><label for="mdown">Простой одной обработки, часов</label><input id="mdown" type="number" min="0" value="2"></div>
+  </div>
+  <hr class="rule">
+  <div class="section-title">Химический метод</div>
+  <div class="grid">
+   <div><label for="capex">Капитальные затраты, руб.</label><input id="capex" type="number" min="0" value="672394.4"></div>
+   <div><label for="opex">Операционные расходы за год, руб.</label><input id="opex" type="number" min="0" value="396000"></div>
+   <div><label for="cdown">Простой одной обработки, часов</label><input id="cdown" type="number" min="0" value="0"></div>
+   <div><label for="saving">Экономия на ремонтах за год, руб.</label><input id="saving" type="number" min="0" value="0"></div>
+  </div>
+  <hr class="rule">
+  <div class="section-title">Комбинированный метод</div>
+  <div class="grid">
+   <div><label for="mixthermal">Доля тепловых обработок, %</label><input id="mixthermal" type="number" min="0" max="100" value="30"></div>
+   <div><label for="mixmech">Доля механических обработок, %</label><input id="mixmech" type="number" min="0" max="100" value="70"></div>
+  </div>
+ </div>
+ <button class="primary" type="submit">Рассчитать эффективность и подобрать метод</button>
+</form>
+<div id="error" class="error" role="alert"></div>
+<div id="results" hidden>
+ <div class="panel">
+  <h2>3. Результаты анализа</h2>
+  <div class="result-grid">
+   <div class="metric"><span class="muted small">Условия по содержанию парафина</span><strong id="risk">—</strong></div>
+   <div class="metric"><span class="muted small">Расчётное число обработок</span><strong id="count">—</strong></div>
+  </div>
+  <p class="muted small">Это предварительная оценка по содержанию парафина, а не прогноз фактической интенсивности отложений.</p>
+ </div>
+ <div class="panel"><h2>4. Сравнение экономической эффективности</h2><div id="cards"></div></div>
+ <div class="panel">
+  <h2>5. Рекомендация системы</h2>
+  <div class="recommend"><div class="num" id="winner"></div><p id="why"></p></div>
+  <div class="result-grid" style="margin-top:13px">
+   <div class="metric"><span class="muted small">Минимальные затраты за период</span><strong id="minimum"></strong></div>
+   <div class="metric"><span class="muted small">Экономия относительно второго варианта</span><strong id="economy"></strong></div>
+  </div>
+  <p class="muted small">Выбор сделан по минимальным расчётным затратам с учётом простоев и указанной экономии на ремонтах. Техническую применимость необходимо подтвердить.</p>
+ </div>
+ <div class="no-print" style="display:flex;gap:9px;flex-wrap:wrap"><button class="primary" style="flex:1" id="print">Печать отчёта / Сохранить в PDF</button><button class="secondary" id="reset">Сбросить результаты</button></div>
+</div>
+</section>
+<section id="methods" hidden>
+ <div class="panel"><h2>Тепловые методы</h2><p>Основаны на нагревании нефти, труб или оборудования для расплавления и удаления парафиновых отложений.</p><ul><li>Промывка горячей нефтью.</li><li>Обработка горячей водой или паром.</li><li>Использование передвижных агрегатов АДПМ.</li></ul><p><b>Преимущества:</b> возможность быстро удалить отложения.</p><p><b>Недостатки:</b> затраты на нагрев, топливо и простой скважины; повторное образование отложений.</p></div>
+ <div class="panel"><h2>Механические методы</h2><p>Предполагают физическое удаление отложений со стенок насосно-компрессорных труб и других элементов оборудования.</p><ul><li>Скребки.</li><li>Скребковые устройства на проволоке.</li><li>Лебёдочные установки.</li><li>Специальные механические очистители.</li></ul><p><b>Преимущества:</b> отсутствие необходимости в большом количестве химических реагентов.</p><p><b>Недостатки:</b> износ оборудования, риск заклинивания и необходимость регулярного обслуживания.</p></div>
+ <div class="panel"><h2>Химические методы</h2><p>Используют реагенты, которые препятствуют образованию отложений, изменяют свойства нефти или растворяют уже сформировавшиеся отложения.</p><ul><li>Ингибиторы парафиноотложения.</li><li>Растворители парафина.</li><li>Диспергаторы.</li><li>Дозирование реагентов через специальные установки, в том числе СПКУ.</li></ul><p><b>Преимущества:</b> возможность профилактики образования АСПО и сокращения числа очисток.</p><p><b>Недостатки:</b> стоимость реагентов, необходимость подбора совместимого состава и контроля дозировки.</p></div>
+ <div class="panel"><h2>Комбинированные методы</h2><p>Сочетают несколько способов борьбы с АСПО. Например, механическое удаление плотных отложений с последующим применением ингибитора.</p><p><b>Преимущества:</b> возможность подобрать технологию под конкретные условия скважины.</p><p><b>Недостатки:</b> более сложная организация работ и необходимость расчёта совместных расходов.</p></div>
+</section>
+<section id="about" hidden>
+ <div class="panel"><h2>Методика и допущения</h2><p>Приложение использует упрощённую сравнительную модель. Все исходные нормативы должны быть проверены по фактическим данным предприятия.</p>
+ <h3>Основные формулы</h3>
+ <p><b>Количество обработок:</b><br>N = округление вверх (число дней / интервал).</p>
+ <p><b>Прямые затраты:</b><br>C = N × стоимость одной обработки.</p>
+ <p><b>Потери добычи:</b><br>L = дебит × (время простоя / 24) × цена нефти.</p>
+ <p><b>Годовые затраты:</b><br>Z = C + L + эксплуатационные расходы + капитальные затраты − экономия на ремонтах.</p>
+ <h3>Важные ограничения</h3>
+ <ul>
+  <li>Цена нефти используется как условный чистый доход за тонну. Для точного расчёта следует использовать маржинальный доход с учётом налогов, транспортировки и переменных затрат.</li>
+  <li>Стоимость обработки, периодичность и простои заданы как исходные допущения, а не универсальные нормативы.</li>
+  <li>Содержание парафина и обводнённость сами по себе не определяют фактическую скорость образования отложений.</li>
+  <li>Глубина скважины сохраняется в исходных данных, но не участвует в денежной формуле без модели стоимости работ, зависящей от глубины.</li>
+  <li>Комбинированный метод рассчитывается как распределение обработок между тепловым и механическим способами. Дополнительные расходы на совместное применение технологий пока не учитываются.</li>
+  <li>Капитальные расходы учитываются полностью в первом году. Для многолетнего сравнения следует добавить срок службы оборудования, амортизацию, дисконтирование и остаточную стоимость.</li>
+ </ul></div>
+</section>
+<footer>АСПО Контроль · Учебная расчётная модель · Все результаты требуют проверки специалистом</footer>
+</div>
+<script>
+(()=>{
+const $=id=>document.getElementById(id), money=x=>new Intl.NumberFormat('ru-RU',{maximumFractionDigits:0}).format(Math.round(x))+' руб.', num=x=>new Intl.NumberFormat('ru-RU',{maximumFractionDigits:1}).format(x);
+document.querySelectorAll('[data-tab]').forEach(btn=>btn.addEventListener('click',()=>{document.querySelectorAll('[data-tab]').forEach(b=>b.classList.toggle('active',b===btn));['calc','methods','about'].forEach(t=>$(t).hidden=t!==btn.dataset.tab)}));
+$('calcForm').addEventListener('submit',e=>{e.preventDefault();calculate()});
+function calculate(){
+ $('error').textContent='';
+ const ids=['prod','par','water','depth','price','days','tcost','tint','tdown','mcost','mint','mdown','capex','opex','cdown','saving','mixthermal','mixmech'];
+ for(const id of ids){const el=$(id),v=Number(el.value);if(el.value.trim()===''||!Number.isFinite(v)||v<Number(el.min)||(el.max!==''&&v>Number(el.max))){$('error').textContent='Проверьте введённые данные: '+el.previousElementSibling.textContent+'.';return}}
+ const p=+$('prod').value,price=+$('price').value,days=+$('days').value,par=+$('par').value;
+ const nt=Math.ceil(days/+$('tint').value),nm=Math.ceil(days/+$('mint').value);
+ const tDirect=nt*+$('tcost').value,tLoss=p*nt*+$('tdown').value/24*price,tTotal=tDirect+tLoss;
+ const mDirect=nm*+$('mcost').value,mLoss=p*nm*+$('mdown').value/24*price,mTotal=mDirect+mLoss;
+ const cLoss=p*+$('cdown').value/24*price,cDirect=+$('capex').value+ +$('opex').value*days/365,cTotal=cDirect+cLoss-+$('saving').value*days/365;
+ const a=+$('mixthermal').value/100,b=+$('mixmech').value/100;
+ if(a+b===0){$('error').textContent='Для комбинированного метода укажите ненулевую долю хотя бы одного метода.';return}
+ const items=[
+ {key:'thermal',name:'Тепловой метод',total:tTotal,direct:tDirect,loss:tLoss,detail:'Тепловых обработок: '+nt},
+ {key:'mech',name:'Механический метод',total:mTotal,direct:mDirect,loss:mLoss,detail:'Механических обработок: '+nm},
+ {key:'chem',name:'Химический метод',total:cTotal,direct:cDirect,loss:cLoss,detail:'Капитальные и эксплуатационные расходы'},
+ {key:'mix',name:'Комбинированный метод',total:a*tTotal+b*mTotal,direct:a*tDirect+b*mDirect,loss:a*tLoss+b*mLoss,detail:'Тепловые '+num(a*100)+'%, механические '+num(b*100)+'%'}
+ ];
+ const sorted=[...items].sort((x,y)=>x.total-y.total),best=sorted[0],second=sorted[1],max=Math.max(1,...items.map(x=>Math.max(0,x.total)));
+ $('risk').textContent=par>=6?'Повышенное содержание парафина':par>=2?'Среднее содержание парафина':'Низкое содержание парафина';
+ $('count').textContent=nt+' тепловых / '+nm+' механических';
+ $('cards').innerHTML=items.map(x=>`<article class="method ${x.key===best.key?'best':''}"><div class="method-head"><b>${x.name}</b>${x.key===best.key?'<span class="tag">Минимум затрат</span>':''}</div><div class="num">${money(x.total)}</div><div class="bar"><div style="width:${Math.max(0,Math.min(100,x.total/max*100))}%"></div></div><div class="two-col"><div><span class="muted small">Прямые расходы</span><br><b>${money(x.direct)}</b></div><div><span class="muted small">Потери добычи</span><br><b>${money(x.loss)}</b></div></div><p class="muted small">${x.detail}</p></article>`).join('');
+ const reasons={
+ thermal:'Тепловой вариант имеет наименьшие расчётные затраты. Проверьте доступность оборудования и эффективность прогрева.',
+ mech:'Механическая очистка имеет наименьшие расчётные затраты. Проверьте проходимость скребков и допустимость механической обработки.',
+ chem:'Химический вариант оказался экономически выгоднее с учётом введённых капитальных затрат, расходов на реагенты и экономии на ремонтах. Эффективность реагента необходимо подтвердить лабораторными испытаниями.',
+ mix:'Комбинированный вариант показал минимальные расчётные расходы при указанном распределении обработок. Проверьте технологическую совместимость методов.'
+ };
+ $('winner').textContent=best.name;$('why').textContent=reasons[best.key]+' Расчёт не учитывает различия в эффективности удаления отложений, риски отказов и ограничения оборудования.';
+ $('minimum').textContent=money(best.total);$('economy').textContent=money(Math.max(0,second.total-best.total));$('results').hidden=false;$('results').scrollIntoView({behavior:'smooth',block:'start'});
+}
+$('print').addEventListener('click',()=>window.print());$('reset').addEventListener('click',()=>{$('results').hidden=true;$('error').textContent='';});
+})();
+</script>
+</body>
+</html>
